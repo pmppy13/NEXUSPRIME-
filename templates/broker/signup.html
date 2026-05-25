@@ -1,0 +1,55 @@
+<!-- templates/broker/signup.html -->
+{% extends 'broker/base.html' %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-16 max-w-md">
+    <div class="glass rounded-2xl p-8 animate-fadeInUp">
+        <div class="text-center mb-6">
+            <i class="fas fa-user-plus text-5xl gradient-text mb-3"></i>
+            <h1 class="text-3xl font-bold">Create Account</h1>
+            <p class="text-gray-400 mt-2">Join NexusPrime and start trading</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Username Field -->
+            <div class="mb-4">
+                <label class="block text-gray-300 mb-2">Username</label>
+                <input type="text" name="username" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white" placeholder="Enter your username" required>
+            </div>
+            
+            <!-- Email Field -->
+            <div class="mb-4">
+                <label class="block text-gray-300 mb-2">Email Address</label>
+                <input type="email" name="email" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white" placeholder="Enter your email" required>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="mb-4">
+                <label class="block text-gray-300 mb-2">Password</label>
+                <input type="password" name="password" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white" placeholder="Create a password" required>
+                <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters</p>
+            </div>
+            
+            <!-- Confirm Password Field -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">Confirm Password</label>
+                <input type="password" name="confirm_password" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white" placeholder="Confirm your password" required>
+            </div>
+            
+            <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full py-3 rounded-lg font-semibold transition transform hover:scale-105">
+                <i class="fas fa-user-plus mr-2"></i> Sign Up
+            </button>
+        </form>
+        
+        <div class="text-center mt-6">
+            <p class="text-gray-400">Already have an account? <a href="{% url 'login' %}" class="text-blue-400 hover:text-blue-300">Login</a></p>
+        </div>
+        
+        <div class="mt-6 pt-6 border-t border-gray-700 text-center">
+            <p class="text-xs text-gray-500">By signing up, you agree to our <a href="#" class="text-blue-400">Terms of Service</a> and <a href="#" class="text-blue-400">Privacy Policy</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'broker/base.html' %}
+{% load static %}
+{% block title %}Home - Trade & Earn{% endblock %}
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-bg overflow-hidden">
+    <div class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div class="lg:w-1/2 animate-fadeInUp">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                    Trade & Earn with <span class="gradient-text">Next-Gen</span> Broker
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Secure deposits, instant approvals, and real crypto wallet management. 
+                    Buy, sell, invest and earn daily profits with NexusPrime.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105 inline-flex items-center">
+                            Go to Dashboard <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'signup' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105 inline-flex items-center">
+                            Get Started <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <a href="{% url 'login' %}" class="border-2 border-blue-600 hover:bg-blue-600/20 px-8 py-3 rounded-lg font-semibold transition inline-flex items-center">
+                            Login <i class="fas fa-sign-in-alt ml-2"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-gray-700">
+                    <div>
+                        <p class="text-2xl md:text-3xl font-bold gradient-text">$50M+</p>
+                        <p class="text-sm text-gray-400">Total Volume</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl md:text-3xl font-bold gradient-text">120K+</p>
+                        <p class="text-sm text-gray-400">Active Users</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl md:text-3xl font-bold gradient-text">24/7</p>
+                        <p class="text-sm text-gray-400">Support</p>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:w-1/2">
+                <div class="grid grid-cols-3 gap-6 items-center justify-items-center">
+                    <i class="fab fa-bitcoin text-7xl md:text-8xl text-orange-500 animate-float" style="animation-delay: 0s;"></i>
+                    <i class="fab fa-ethereum text-7xl md:text-8xl text-purple-500 animate-float" style="animation-delay: 0.5s;"></i>
+                    <i class="fab fa-solana text-7xl md:text-8xl text-green-500 animate-float" style="animation-delay: 1s;"></i>
+                    <i class="fab fa-cardano text-6xl md:text-7xl text-blue-500 animate-float" style="animation-delay: 1.5s;"></i>
+                    <i class="fab fa-litecoin text-6xl md:text-7xl text-gray-400 animate-float" style="animation-delay: 2s;"></i>
+                    <i class="fas fa-coins text-6xl md:text-7xl text-yellow-500 animate-float" style="animation-delay: 2.5s;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div id="features" class="container mx-auto px-4 md:px-6 py-20">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Why Choose NexusPrime?</h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">Experience the future of crypto trading with our advanced platform</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="glass rounded-2xl p-6 text-center card-hover">
+            <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-shield-alt text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Secure Vault</h3>
+            <p class="text-gray-400">Military-grade encryption for your funds and data</p>
+        </div>
+        <div class="glass rounded-2xl p-6 text-center card-hover">
+            <div class="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-bolt text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Instant Processing</h3>
+            <p class="text-gray-400">Fast deposits and withdrawals with automated approval</p>
+        </div>
+        <div class="glass rounded-2xl p-6 text-center card-hover">
+            <div class="w-16 h-16 bg-gradient-to-r from-yellow-600 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-chart-line text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Daily Profits</h3>
+            <p class="text-gray-400">Earn up to 5% daily with our investment plans</p>
+        </div>
+        <div class="glass rounded-2xl p-6 text-center card-hover">
+            <div class="w-16 h-16 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-headset text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">24/7 Support</h3>
+            <p class="text-gray-400">Dedicated support team always ready to help</p>
+        </div>
+    </div>
+</div>
+
+<!-- Investment Plans Section -->
+<div class="bg-gray-800/30 py-20">
+    <div class="container mx-auto px-4 md:px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Investment Plans</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">Choose the plan that fits your goals and start earning daily</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Basic Plan -->
+            <div class="glass rounded-2xl p-6 text-center card-hover">
+                <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-seedling text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Basic</h3>
+                <p class="text-3xl font-bold gradient-text mb-2">2% Daily</p>
+                <p class="text-gray-400 mb-4">For 30 days</p>
+                <ul class="text-left space-y-2 mb-6 text-gray-300 text-sm">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Min: $100</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Max: $5,000</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Total: 60% profit</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Capital included</li>
+                </ul>
+                <a href="{% url 'signup' %}" class="block bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition">Get Started</a>
+            </div>
+            <!-- Silver Plan -->
+            <div class="glass rounded-2xl p-6 text-center card-hover transform scale-105 relative">
+                <div class="absolute top-4 right-4 bg-yellow-500 text-xs px-2 py-1 rounded-full">Popular</div>
+                <div class="w-20 h-20 bg-gradient-to-r from-gray-500 to-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-gem text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Silver</h3>
+                <p class="text-3xl font-bold gradient-text mb-2">3% Daily</p>
+                <p class="text-gray-400 mb-4">For 30 days</p>
+                <ul class="text-left space-y-2 mb-6 text-gray-300 text-sm">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Min: $5,000</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Max: $20,000</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Total: 90% profit</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Capital included</li>
+                </ul>
+                <a href="{% url 'signup' %}" class="block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-2 rounded-lg transition">Get Started</a>
+            </div>
+            <!-- Gold Plan -->
+            <div class="glass rounded-2xl p-6 text-center card-hover">
+                <div class="w-20 h-20 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-crown text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Gold</h3>
+                <p class="text-3xl font-bold gradient-text mb-2">4% Daily</p>
+                <p class="text-gray-400 mb-4">For 30 days</p>
+                <ul class="text-left space-y-2 mb-6 text-gray-300 text-sm">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Min: $20,000</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Max: $50,000</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Total: 120% profit</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Capital included</li>
+                </ul>
+                <a href="{% url 'signup' %}" class="block bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition">Get Started</a>
+            </div>
+            <!-- Platinum Plan -->
+            <div class="glass rounded-2xl p-6 text-center card-hover">
+                <div class="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-rocket text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Platinum</h3>
+                <p class="text-3xl font-bold gradient-text mb-2">5% Daily</p>
+                <p class="text-gray-400 mb-4">For 30 days</p>
+                <ul class="text-left space-y-2 mb-6 text-gray-300 text-sm">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Min: $50,000</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Max: Unlimited</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Total: 150% profit</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Capital included</li>
+                </ul>
+                <a href="{% url 'signup' %}" class="block bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition">Get Started</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Section -->
+<div class="container mx-auto px-4 md:px-6 py-20">
+    <div class="flex flex-col lg:flex-row gap-12 items-center">
+        <div class="lg:w-1/2">
+            <div class="glass rounded-2xl p-8">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">About NexusPrime</h2>
+                <p class="text-gray-300 mb-4 leading-relaxed">
+                    NexusPrime is a leading cryptocurrency broker platform founded with a mission to democratize access to digital asset trading and investment.
+                </p>
+                <p class="text-gray-300 mb-6 leading-relaxed">
+                    We provide secure, transparent, and user-friendly trading experience with multiple payment options, daily profit returns, and 24/7 customer support.
+                </p>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Licensed & Regulated</div>
+                    <div class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> SSL Secured</div>
+                    <div class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Cold Storage</div>
+                    <div class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Instant Withdrawals</div>
+                </div>
+                <a href="{% url 'about' %}" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition">
+                    Read More <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="lg:w-1/2">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass rounded-2xl p-6 text-center">
+                    <i class="fas fa-chart-line text-4xl text-green-500 mb-3"></i>
+                    <p class="text-2xl font-bold">$50M+</p>
+                    <p class="text-gray-400">Trading Volume</p>
+                </div>
+                <div class="glass rounded-2xl p-6 text-center">
+                    <i class="fas fa-users text-4xl text-blue-500 mb-3"></i>
+                    <p class="text-2xl font-bold">120K+</p>
+                    <p class="text-gray-400">Happy Users</p>
+                </div>
+                <div class="glass rounded-2xl p-6 text-center">
+                    <i class="fas fa-clock text-4xl text-yellow-500 mb-3"></i>
+                    <p class="text-2xl font-bold">24/7</p>
+                    <p class="text-gray-400">Support</p>
+                </div>
+                <div class="glass rounded-2xl p-6 text-center">
+                    <i class="fas fa-globe text-4xl text-purple-500 mb-3"></i>
+                    <p class="text-2xl font-bold">150+</p>
+                    <p class="text-gray-400">Countries</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-gradient-to-r from-blue-900/50 to-purple-900/50 py-16">
+    <div class="container mx-auto px-4 md:px-6 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Start Earning?</h2>
+        <p class="text-gray-300 mb-8 max-w-2xl mx-auto">Join thousands of satisfied traders and start earning daily profits today</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105">
+                Go to Dashboard <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'signup' %}" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105">
+                Create Free Account <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

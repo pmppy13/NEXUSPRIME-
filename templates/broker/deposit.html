@@ -1,0 +1,348 @@
+<!-- templates/broker/deposit.html -->
+{% extends 'broker/base.html' %}
+{% load humanize %}
+{% block title %}Make a Deposit{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 md:px-6 py-8 max-w-4xl">
+    <div class="animate-fadeInUp">
+        <!-- Main Card -->
+        <div class="glass rounded-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-900/50 to-purple-900/50 px-6 py-5 border-b border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold"><i class="fas fa-money-bill-wave mr-2 text-green-500"></i>Make a Deposit</h1>
+                        <p class="text-gray-400 text-sm mt-1">Select a payment method and follow the instructions</p>
+                    </div>
+                    <i class="fas fa-shield-alt text-3xl text-blue-400 opacity-50"></i>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-0">
+                <!-- LEFT: Payment Methods List -->
+                <div class="border-r border-gray-700">
+                    <div class="p-4 bg-gray-800/30">
+                        <h3 class="font-semibold text-gray-300 text-sm uppercase tracking-wide"><i class="fas fa-credit-card mr-2"></i>Payment Methods</h3>
+                    </div>
+                    <div class="divide-y divide-gray-700 max-h-[500px] overflow-y-auto">
+                        {% for method in payment_methods %}
+                        <div class="payment-method-item p-4 cursor-pointer transition-all duration-300 hover:bg-gray-700/30 {% if forloop.first %}active-method bg-blue-900/20 border-l-4 border-blue-500{% endif %}" 
+                             data-method-id="{{ method.id }}"
+                             data-method-type="{{ method.method_type }}"
+                             data-method-name="{{ method.name }}">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center 
+                                    {% if method.method_type == 'crypto' %}bg-orange-500/20 text-orange-400
+                                    {% elif method.method_type == 'cashapp' %}bg-green-500/20 text-green-400
+                                    {% elif method.method_type == 'paypal' %}bg-blue-500/20 text-blue-400
+                                    {% else %}bg-purple-500/20 text-purple-400{% endif %}">
+                                    <i class="{% if method.method_type == 'crypto' %}fab fa-bitcoin
+                                             {% elif method.method_type == 'cashapp' %}fab fa-square-cashapp
+                                             {% elif method.method_type == 'paypal' %}fab fa-paypal
+                                             {% else %}fas fa-university{% endif %} text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">{{ method.name }}</p>
+                                    <p class="text-xs text-gray-400">Min: ${{ method.minimum_deposit|floatformat:0 }}</p>
+                                </div>
+                                {% if forloop.first %}
+                                <span class="ml-auto text-xs bg-blue-600 px-2 py-1 rounded-full">Recommended</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-8 text-center text-gray-400">
+                            <i class="fas fa-ban text-4xl mb-3"></i>
+                            <p>No payment methods available</p>
+                            <p class="text-sm mt-2">Contact admin to add payment methods</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- RIGHT: Payment Details & Form -->
+                <div class="p-6">
+                    <div id="payment-details-container">
+                        <!-- Dynamic content loaded via JavaScript -->
+                        <div class="text-center py-12 text-gray-400">
+                            <i class="fas fa-hand-point-left text-5xl mb-3 opacity-50"></i>
+                            <p>Select a payment method from the left</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Payment methods data from Django
+const paymentMethodsData = {};
+{% for method in payment_methods %}
+paymentMethodsData[{{ method.id }}] = {
+    id: {{ method.id }},
+    name: "{{ method.name|escapejs }}",
+    method_type: "{{ method.method_type }}",
+    minimum_deposit: "{{ method.minimum_deposit }}",
+    maximum_deposit: "{{ method.maximum_deposit }}",
+    instructions: "{{ method.instructions|default:''|escapejs }}",
+    {% if method.method_type == 'crypto' %}
+        wallet_address: "{{ method.wallet_address|default:''|escapejs }}",
+        network: "{{ method.network|default:''|escapejs }}",
+        memo_tag: "{{ method.memo_tag|default:''|escapejs }}",
+    {% elif method.method_type == 'bank' %}
+        bank_name: "{{ method.bank_name|default:''|escapejs }}",
+        account_name: "{{ method.account_name|default:''|escapejs }}",
+        account_number: "{{ method.account_number|default:''|escapejs }}",
+        routing_number: "{{ method.routing_number|default:''|escapejs }}",
+        swift_code: "{{ method.swift_code|default:''|escapejs }}",
+    {% elif method.method_type == 'cashapp' %}
+        cashapp_tag: "{{ method.cashapp_tag|default:''|escapejs }}",
+    {% elif method.method_type == 'paypal' %}
+        paypal_email: "{{ method.paypal_email|default:''|escapejs }}",
+    {% endif %}
+};
+{% endfor %}
+
+let currentMethodId = null;
+
+// Update active method styling
+document.querySelectorAll('.payment-method-item').forEach(item => {
+    item.addEventListener('click', function() {
+        document.querySelectorAll('.payment-method-item').forEach(el => {
+            el.classList.remove('active-method', 'bg-blue-900/20', 'border-l-4', 'border-blue-500');
+        });
+        this.classList.add('active-method', 'bg-blue-900/20', 'border-l-4', 'border-blue-500');
+        
+        const methodId = parseInt(this.dataset.methodId);
+        currentMethodId = methodId;
+        loadPaymentDetails(methodId);
+    });
+});
+
+function loadPaymentDetails(methodId) {
+    const method = paymentMethodsData[methodId];
+    if (!method) return;
+    
+    const container = document.getElementById('payment-details-container');
+    
+    let detailsHtml = `
+        <div class="animate-fadeInUp">
+            <div class="mb-5">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-info-circle text-blue-400"></i>
+                    Payment Details
+                </h2>
+                <p class="text-gray-400 text-sm">Send to the details below and upload proof</p>
+            </div>
+            
+            <!-- Limits Info -->
+            <div class="bg-yellow-900/20 rounded-xl p-3 mb-5 flex items-center gap-3">
+                <i class="fas fa-info-circle text-yellow-500 text-xl"></i>
+                <div class="text-sm">
+                    <span class="text-yellow-400 font-semibold">Limits:</span>
+                    <span class="text-gray-300"> Min $${method.minimum_deposit} — Max $${method.maximum_deposit}</span>
+                </div>
+            </div>
+    `;
+    
+    // Show method-specific details
+    if (method.method_type === 'crypto') {
+        detailsHtml += `
+            <div class="space-y-4">
+                <div class="bg-gray-800/50 rounded-xl p-4">
+                    <label class="text-xs text-gray-400 uppercase tracking-wide">Wallet Address</label>
+                    <div class="flex items-center justify-between gap-2 mt-1">
+                        <code class="text-sm font-mono break-all text-blue-300">${method.wallet_address || 'Not configured'}</code>
+                        ${method.wallet_address ? `<button onclick="copyToClipboard('${method.wallet_address}')" class="copy-btn text-blue-400 hover:text-blue-300 text-sm"><i class="fas fa-copy"></i> Copy</button>` : ''}
+                    </div>
+                </div>
+                ${method.network ? `
+                <div class="bg-gray-800/50 rounded-xl p-4">
+                    <label class="text-xs text-gray-400 uppercase tracking-wide">Network</label>
+                    <p class="text-sm font-semibold mt-1">${method.network}</p>
+                </div>
+                ` : ''}
+                ${method.memo_tag ? `
+                <div class="bg-red-900/20 rounded-xl p-4 border border-red-500/30">
+                    <label class="text-xs text-red-400 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> IMPORTANT: Memo Tag Required
+                    </label>
+                    <div class="flex items-center justify-between gap-2 mt-1">
+                        <code class="text-sm font-mono font-bold text-red-300">${method.memo_tag}</code>
+                        <button onclick="copyToClipboard('${method.memo_tag}')" class="copy-btn text-red-400 hover:text-red-300 text-sm"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <p class="text-xs text-red-400/70 mt-2">⚠️ You MUST include this memo/tag for your deposit to be credited</p>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    } 
+    else if (method.method_type === 'bank') {
+        detailsHtml += `
+            <div class="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl p-5 space-y-3">
+                <div class="flex justify-between items-center pb-2 border-b border-gray-700">
+                    <span class="text-gray-400 text-sm">Bank Name</span>
+                    <strong class="text-white">${method.bank_name || 'N/A'}</strong>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-700">
+                    <span class="text-gray-400 text-sm">Account Name</span>
+                    <strong class="text-white">${method.account_name || 'N/A'}</strong>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-700">
+                    <span class="text-gray-400 text-sm">Account Number</span>
+                    <div class="flex items-center gap-2">
+                        <strong class="text-white font-mono text-lg">${method.account_number || 'N/A'}</strong>
+                        ${method.account_number ? `<button onclick="copyToClipboard('${method.account_number}')" class="copy-btn text-blue-400 text-sm"><i class="fas fa-copy"></i></button>` : ''}
+                    </div>
+                </div>
+                ${method.routing_number ? `
+                <div class="flex justify-between items-center pb-2 border-b border-gray-700">
+                    <span class="text-gray-400 text-sm">Routing Number</span>
+                    <strong>${method.routing_number}</strong>
+                </div>
+                ` : ''}
+                ${method.swift_code ? `
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400 text-sm">SWIFT Code</span>
+                    <strong>${method.swift_code}</strong>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    else if (method.method_type === 'cashapp') {
+        detailsHtml += `
+            <div class="bg-gradient-to-r from-green-900/20 to-teal-900/20 rounded-xl p-5 text-center">
+                <i class="fab fa-square-cashapp text-5xl text-green-400 mb-3"></i>
+                <div class="bg-gray-800 rounded-lg p-3 inline-block mb-3">
+                    <code class="text-2xl font-bold text-green-400">${method.cashapp_tag || '$YourCashtag'}</code>
+                </div>
+                <button onclick="copyToClipboard('${method.cashapp_tag}')" class="copy-btn bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition w-full">
+                    <i class="fas fa-copy mr-2"></i> Copy Cashtag
+                </button>
+            </div>
+        `;
+    }
+    else if (method.method_type === 'paypal') {
+        detailsHtml += `
+            <div class="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-xl p-5 text-center">
+                <i class="fab fa-paypal text-5xl text-blue-400 mb-3"></i>
+                <div class="bg-gray-800 rounded-lg p-3 inline-block mb-3">
+                    <code class="text-lg font-mono">${method.paypal_email || 'payments@nexusprime.com'}</code>
+                </div>
+                <button onclick="copyToClipboard('${method.paypal_email}')" class="copy-btn bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition w-full">
+                    <i class="fas fa-copy mr-2"></i> Copy Email
+                </button>
+            </div>
+        `;
+    }
+    
+    // Instructions
+    if (method.instructions) {
+        detailsHtml += `
+            <div class="mt-5 bg-gray-800/30 rounded-xl p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-clipboard-list text-blue-400"></i>
+                    <span class="font-semibold text-sm">Instructions:</span>
+                </div>
+                <p class="text-sm text-gray-300">${method.instructions}</p>
+            </div>
+        `;
+    }
+    
+    // Deposit Form
+    detailsHtml += `
+        <form method="POST" enctype="multipart/form-data" class="mt-6 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="payment_method" value="${method.id}">
+            
+            <div>
+                <label class="block text-gray-300 text-sm mb-2">Amount (USD) *</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+                    <input type="number" name="amount_usd" step="0.01" min="${method.minimum_deposit}" max="${method.maximum_deposit}"
+                           class="w-full pl-8 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white"
+                           placeholder="0.00" required>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Amount must be between $${method.minimum_deposit} and $${method.maximum_deposit}</p>
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 text-sm mb-2">Transaction ID / Reference</label>
+                <input type="text" name="transaction_hash" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white"
+                       placeholder="Enter transaction ID or reference number">
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 text-sm mb-2">Your Sender Info (Wallet/Account Name)</label>
+                <input type="text" name="sender_info" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-white"
+                       placeholder="Your wallet address or account name">
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 text-sm mb-2">Proof of Payment (Screenshot/Photo) *</label>
+                <div class="upload-box border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition bg-gray-800/30"
+                     onclick="document.getElementById('proofInput').click()">
+                    <i class="fas fa-cloud-upload-alt text-3xl text-blue-400 mb-2"></i>
+                    <p class="text-sm text-gray-400">Click or drag to upload</p>
+                    <input type="file" name="proof_image" id="proofInput" accept="image/*" class="hidden" required>
+                    <div id="fileNameDisplay" class="text-xs text-blue-400 mt-2"></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-3 rounded-xl font-semibold transition transform hover:scale-[1.02]">
+                <i class="fas fa-paper-plane mr-2"></i> Submit Deposit Request
+            </button>
+        </form>
+        
+        <div class="mt-4 p-3 bg-yellow-900/20 rounded-lg text-center">
+            <i class="fas fa-clock text-yellow-500 mr-2"></i>
+            <span class="text-xs text-gray-300">After submitting, admin will review your proof within 24 hours</span>
+        </div>
+    </div>`;
+    
+    container.innerHTML = detailsHtml;
+    
+    // File input preview
+    const fileInput = document.getElementById('proofInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const fileName = document.getElementById('fileNameDisplay');
+            if (this.files && this.files[0]) {
+                fileName.textContent = this.files[0].name;
+            }
+        });
+    }
+}
+
+// Load first method by default
+if (document.querySelector('.payment-method-item')) {
+    const firstMethod = document.querySelector('.payment-method-item');
+    const firstMethodId = parseInt(firstMethod.dataset.methodId);
+    loadPaymentDetails(firstMethodId);
+}
+</script>
+
+<style>
+.payment-method-item {
+    transition: all 0.3s ease;
+}
+.payment-method-item.active-method {
+    background: rgba(59, 130, 246, 0.1);
+}
+.copy-btn {
+    transition: all 0.2s ease;
+}
+.copy-btn:hover {
+    transform: scale(1.05);
+}
+.upload-box {
+    transition: all 0.3s ease;
+}
+.upload-box:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+}
+</style>
+{% endblock %}

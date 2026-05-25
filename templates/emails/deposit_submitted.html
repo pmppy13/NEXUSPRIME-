@@ -1,0 +1,50 @@
+<!-- templates/emails/deposit_submitted.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Deposit Request Received</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }
+        .header h1 { color: white; margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .amount { font-size: 36px; font-weight: bold; color: #27ae60; text-align: center; margin: 20px 0; }
+        .details { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .status-pending { display: inline-block; background: #f39c12; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; }
+        .button { display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        .footer { background: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📥 Deposit Request Received</h1>
+        </div>
+        <div class="content">
+            <h2>Hello {{ username }},</h2>
+            <p>We have received your deposit request. Our team will review it shortly.</p>
+            
+            <div class="amount">${{ amount }}</div>
+            
+            <div class="details">
+                <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+                <p><strong>Transaction ID:</strong> {{ transaction_id }}</p>
+                <p><strong>Status:</strong> <span class="status-pending">Pending Review</span></p>
+                <p><strong>Submitted:</strong> {{ submitted_date }}</p>
+            </div>
+            
+            <p>Once approved, the funds will be added to your wallet. You will receive another email when your deposit is approved.</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ dashboard_url }}" class="button">View Deposit Status</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 NexusPrime. All rights reserved.</p>
+            <p>This is an automated message, please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>

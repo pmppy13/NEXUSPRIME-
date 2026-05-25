@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>NexusPrime - {% block title %}Crypto Broker{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .animate-slideIn {
+            animation: slideIn 0.5s ease-out;
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .hero-bg {
+            background: radial-gradient(circle at 30% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+        .toast-message {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+        }
+        /* Loading spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Glass morphism */
+        .glass {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen font-sans">
+    
+    <!-- Navbar -->
+    <nav class="bg-gray-900/80 backdrop-blur-lg border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 md:px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="{% url 'home' %}" class="text-2xl md:text-3xl font-bold">
+                    <span class="gradient-text">Nexus</span><span class="text-white">Prime</span>
+                </a>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="{% url 'home' %}" class="hover:text-blue-400 transition duration-300">Home</a>
+                    <a href="{% url 'about' %}" class="hover:text-blue-400 transition duration-300">About</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="hover:text-blue-400 transition duration-300">Dashboard</a>
+                        <a href="{% url 'deposit' %}" class="hover:text-green-400 transition duration-300">Deposit</a>
+                        <a href="{% url 'withdrawal' %}" class="hover:text-yellow-400 transition duration-300">Withdraw</a>
+                        <a href="{% url 'investments' %}" class="hover:text-purple-400 transition duration-300">Investments</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'admin:index' %}" class="hover:text-red-400 transition duration-300">Admin Panel</a>
+                        {% endif %}
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 bg-gray-800 rounded-full px-4 py-2 hover:bg-gray-700 transition">
+                                <i class="fas fa-user-circle text-xl"></i>
+                                <span>{{ user.username|truncatechars:10 }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl hidden group-hover:block z-50 border border-gray-700">
+                                <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-gray-700 transition">Profile</a>
+                                <a href="{% url 'dashboard' %}" class="block px-4 py-2 hover:bg-gray-700 transition">Wallet</a>
+                                <hr class="border-gray-700">
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 hover:bg-red-600 transition text-red-400">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="hover:text-blue-400 transition duration-300">Login</a>
+                        <a href="{% url 'signup' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-5 py-2 rounded-lg transition duration-300">
+                            Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 space-y-3 mobile-menu animate-slideIn">
+                <a href="{% url 'home' %}" class="block hover:text-blue-400 transition py-2">Home</a>
+                <a href="{% url 'about' %}" class="block hover:text-blue-400 transition py-2">About</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="block hover:text-blue-400 transition py-2">Dashboard</a>
+                    <a href="{% url 'deposit' %}" class="block hover:text-green-400 transition py-2">Deposit</a>
+                    <a href="{% url 'withdrawal' %}" class="block hover:text-yellow-400 transition py-2">Withdraw</a>
+                    <a href="{% url 'investments' %}" class="block hover:text-purple-400 transition py-2">Investments</a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin:index' %}" class="block hover:text-red-400 transition py-2">Admin Panel</a>
+                    {% endif %}
+                    <div class="pt-2 border-t border-gray-700">
+                        <span class="text-blue-400 block py-2">{{ user.username }}</span>
+                        <a href="{% url 'logout' %}" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg inline-block transition">Logout</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="block hover:text-blue-400 transition py-2">Login</a>
+                    <a href="{% url 'signup' %}" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg inline-block transition">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Messages -->
+    {% if messages %}
+        <div class="fixed top-20 right-4 z-50 space-y-2">
+            {% for message in messages %}
+                <div class="toast-message px-6 py-3 rounded-lg shadow-lg animate-fadeInUp {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} mr-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900/90 border-t border-gray-800 mt-20">
+        <div class="container mx-auto px-4 md:px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">NexusPrime</h3>
+                    <p class="text-gray-400">Your trusted crypto broker for secure and profitable trading.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition text-xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition text-xl"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition text-xl"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition text-xl"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="{% url 'home' %}" class="hover:text-blue-400 transition">Home</a></li>
+                        <li><a href="{% url 'about' %}" class="hover:text-blue-400 transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg">Payment Methods</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p><i class="fab fa-bitcoin text-orange-500 mr-2"></i> Bitcoin (BTC)</p>
+                        <p><i class="fab fa-ethereum text-purple-500 mr-2"></i> Ethereum (ETH)</p>
+                        <p><i class="fas fa-coins text-yellow-500 mr-2"></i> USDT / USDC</p>
+                        <p><i class="fab fa-paypal text-blue-500 mr-2"></i> PayPal</p>
+                        <p><i class="fab fa-square-cashapp text-green-500 mr-2"></i> CashApp</p>
+                        <p><i class="fas fa-university text-red-500 mr-2"></i> Bank Transfer</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg">Newsletter</h4>
+                    <p class="text-gray-400 mb-3">Get the latest updates and offers</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="flex-1 px-4 py-2 rounded-l-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-blue-500">
+                        <button class="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 rounded-r-lg hover:from-blue-700 hover:to-purple-700 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2025 NexusPrime. All rights reserved. | <a href="#" class="hover:text-blue-400">Privacy Policy</a> | <a href="#" class="hover:text-blue-400">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Mobile menu toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // Auto-hide messages after 5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.toast-message').forEach(msg => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+        
+        // Copy to clipboard function
+        window.copyToClipboard = function(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            });
+        };
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg animate-fadeInUp ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // Format number with commas
+        window.formatNumber = function(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

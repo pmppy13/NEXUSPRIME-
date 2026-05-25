@@ -1,0 +1,190 @@
+{% extends 'broker/base.html' %}
+{% load humanize %}
+{% block title %}Investment Plans{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 md:px-6 py-8">
+    <div class="animate-fadeInUp">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-center gradient-text">Investment Plans</h1>
+        <p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto">Choose a plan and start earning daily profits</p>
+
+        <!-- Available Plans -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {% for plan in investment_plans %}
+            <div class="glass rounded-2xl overflow-hidden card-hover">
+                <div class="p-6 text-center">
+                    <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">{{ plan.name }}</h3>
+                    <p class="text-3xl font-bold gradient-text mb-2">{{ plan.daily_interest_rate }}% Daily</p>
+                    <p class="text-gray-400 mb-4">For {{ plan.duration_days }} days</p>
+                    <ul class="text-left space-y-2 mb-6 text-gray-300 text-sm">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Min: ${{ plan.minimum_amount|floatformat:0|intcomma }}</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Max: ${{ plan.maximum_amount|floatformat:0|intcomma }}</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Daily Payout</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Capital Included</li>
+                    </ul>
+                    <button onclick="showInvestmentModal({{ plan.id }}, '{{ plan.name }}', {{ plan.minimum_amount }}, {{ plan.maximum_amount }}, {{ plan.daily_interest_rate }}, {{ plan.duration_days }})" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-2 rounded-lg transition">
+                        Invest Now
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-chart-line text-5xl text-gray-500 mb-3"></i>
+                <p class="text-gray-400">No investment plans available yet.</p>
+                <p class="text-sm text-gray-500">Contact admin to add investment plans.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Active Investments -->
+        {% if user_investments %}
+        <div class="glass rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-chart-line mr-2 text-green-500"></i>Your Active Investments</h2>
+            <div class="space-y-4">
+                {% for investment in user_investments %}
+                {% if investment.status == 'active' %}
+                <div class="bg-gray-700/30 rounded-xl p-4">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-3">
+                        <div>
+                            <p class="font-bold text-lg">{{ investment.plan.name }}</p>
+                            <p class="text-sm text-gray-400">Invested: ${{ investment.amount|floatformat:2|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Daily Profit</p>
+                            <p class="font-bold text-green-500">+${{ investment.daily_profit|floatformat:2 }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Received</p>
+                            <p class="font-bold">${{ investment.total_received_profit|floatformat:2|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Expected</p>
+                            <p class="font-bold">${{ investment.total_expected_profit|floatformat:2|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Days Left</p>
+                            <p class="font-bold text-yellow-400">{{ investment.days_remaining }} days</p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-600 rounded-full h-2">
+                        {% with progress=investment.total_received_profit|floatformat:0|add:0 %}
+                        {% widthratio investment.total_received_profit investment.total_expected_profit 100 as progress_percent %}
+                        <div class="bg-gradient-to-r from-green-500 to-green-400 rounded-full h-2" style="width: {{ progress_percent }}%"></div>
+                        {% endwith %}
+                    </div>
+                    <p class="text-right text-xs text-gray-400 mt-1">{{ progress_percent }}% complete</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- How It Works -->
+        <div class="glass rounded-2xl p-8">
+            <h2 class="text-2xl font-bold mb-6 text-center">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-hand-holding-usd text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">1. Choose a Plan</h3>
+                    <p class="text-gray-400 text-sm">Select the plan that fits your budget</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-coins text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">2. Invest Amount</h3>
+                    <p class="text-gray-400 text-sm">Enter amount between min and max limits</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">3. Earn Daily</h3>
+                    <p class="text-gray-400 text-sm">Get daily profits added to your wallet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Investment Modal -->
+<div id="investmentModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 animate-fadeInUp">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-2xl font-bold">Invest in <span id="planName"></span></h3>
+            <button onclick="closeInvestmentModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="plan_id" id="planId">
+            <div class="mb-4">
+                <label class="block text-gray-300 mb-2">Investment Amount (USD)</label>
+                <input type="number" name="amount" id="investmentAmount" step="0.01" 
+                       class="w-full px-4 py-3 rounded-xl bg-gray-700 border border-gray-600 focus:border-blue-500 focus:outline-none text-white" 
+                       placeholder="Enter amount" required>
+                <p class="text-sm text-gray-400 mt-1">Min: $<span id="minAmount"></span> | Max: $<span id="maxAmount"></span></p>
+            </div>
+            <div class="mb-4 p-3 bg-blue-900/30 rounded-lg">
+                <p class="text-sm text-blue-300">Your available balance: <strong id="walletBalance">$0</strong></p>
+            </div>
+            <div class="mb-4 p-3 bg-green-900/30 rounded-lg">
+                <p class="text-sm text-green-300">Daily profit will be: <strong id="dailyProfit">$0</strong> per day</p>
+                <p class="text-xs text-gray-400 mt-1">Total expected: <span id="totalProfit">$0</span></p>
+            </div>
+            <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full py-3 rounded-lg font-semibold transition">
+                Confirm Investment
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+let currentPlanRate = 0;
+let currentPlanDays = 0;
+
+function showInvestmentModal(planId, planName, minAmount, maxAmount, dailyRate, durationDays) {
+    currentPlanRate = dailyRate;
+    currentPlanDays = durationDays;
+    
+    document.getElementById('planName').innerText = planName;
+    document.getElementById('planId').value = planId;
+    document.getElementById('minAmount').innerText = minAmount.toLocaleString();
+    document.getElementById('maxAmount').innerText = maxAmount.toLocaleString();
+    document.getElementById('investmentAmount').min = minAmount;
+    document.getElementById('investmentAmount').max = maxAmount;
+    
+    // Set wallet balance from Django
+    const walletBalance = {{ wallet.usd_balance|default:0 }};
+    document.getElementById('walletBalance').innerText = '$' + walletBalance.toLocaleString();
+    
+    document.getElementById('investmentModal').style.display = 'flex';
+    
+    // Add amount input listener
+    const amountInput = document.getElementById('investmentAmount');
+    amountInput.oninput = function() {
+        const amount = parseFloat(this.value) || 0;
+        const dailyProfit = amount * (currentPlanRate / 100);
+        const totalProfit = dailyProfit * currentPlanDays;
+        document.getElementById('dailyProfit').innerText = '$' + dailyProfit.toFixed(2);
+        document.getElementById('totalProfit').innerText = '$' + (amount + totalProfit).toFixed(2);
+    };
+}
+
+function closeInvestmentModal() {
+    document.getElementById('investmentModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('investmentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeInvestmentModal();
+    }
+});
+</script>
+{% endblock %}

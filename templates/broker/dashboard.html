@@ -1,0 +1,218 @@
+<!-- templates/broker/dashboard.html -->
+{% extends 'broker/base.html' %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 md:px-6 py-8">
+    <div class="animate-fadeInUp">
+        <!-- Welcome Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold">Welcome back, {{ user.username }}!</h1>
+            <p class="text-gray-400 mt-2">Here's your trading overview</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass rounded-2xl p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Total Balance</p>
+                        <p class="text-3xl font-bold">${{ wallet.usd_balance|floatformat:2|intcomma }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-600/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-wallet text-xl text-blue-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Total Profit</p>
+                        <p class="text-3xl font-bold">${{ total_profit|floatformat:2|intcomma }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-600/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-line text-xl text-green-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Total Deposited</p>
+                        <p class="text-3xl font-bold">${{ wallet.total_deposited|floatformat:2|intcomma }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-600/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-arrow-down text-xl text-purple-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Active Investments</p>
+                        <p class="text-3xl font-bold">{{ active_investments_count }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-600/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-pie text-xl text-yellow-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Investments Section -->
+        {% if active_investments %}
+        <div class="glass rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-chart-line mr-2 text-green-500"></i>Active Investments</h2>
+            <div class="space-y-4">
+                {% for investment in active_investments %}
+                <div class="bg-gray-700/30 rounded-xl p-4">
+                    <div class="flex justify-between items-center flex-wrap gap-3 mb-3">
+                        <div>
+                            <p class="font-bold text-lg">{{ investment.plan_name }}</p>
+                            <p class="text-sm text-gray-400">Invested: ${{ investment.amount|floatformat:2|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Daily Profit</p>
+                            <p class="font-bold text-green-500">+${{ investment.daily_profit|floatformat:2 }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Total Received</p>
+                            <p class="font-bold">${{ investment.total_received|floatformat:2|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Expected Total</p>
+                            <p class="font-bold">${{ investment.expected_total|floatformat:2|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Days Left</p>
+                            <p class="font-bold text-yellow-400">{{ investment.days_left }} days</p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-600 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-500 to-green-400 rounded-full h-2" 
+                             style="width: {{ investment.percentage_complete }}%"></div>
+                    </div>
+                    <p class="text-right text-xs text-gray-400 mt-1">{{ investment.percentage_complete }}% complete</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="glass rounded-2xl p-6 mb-8 text-center">
+            <i class="fas fa-chart-line text-5xl text-gray-500 mb-3"></i>
+            <p class="text-gray-400">No active investments yet</p>
+            <a href="{% url 'investments' %}" class="inline-block mt-3 bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 rounded-lg text-sm hover:from-blue-700 hover:to-purple-700 transition">
+                Start Investing
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- Wallet Section -->
+        <div class="glass rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-coins mr-2 text-yellow-500"></i>Your Wallet</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="text-center p-3 bg-gray-700/30 rounded-xl">
+                    <i class="fas fa-dollar-sign text-2xl text-green-500"></i>
+                    <p class="text-sm text-gray-400 mt-1">USD Balance</p>
+                    <p class="font-bold text-lg">${{ wallet.usd_balance|floatformat:2|intcomma }}</p>
+                </div>
+                <div class="text-center p-3 bg-gray-700/30 rounded-xl">
+                    <i class="fab fa-bitcoin text-2xl text-orange-500"></i>
+                    <p class="text-sm text-gray-400 mt-1">BTC</p>
+                    <p class="font-bold">{{ wallet.btc_balance|floatformat:8 }}</p>
+                </div>
+                <div class="text-center p-3 bg-gray-700/30 rounded-xl">
+                    <i class="fab fa-ethereum text-2xl text-purple-500"></i>
+                    <p class="text-sm text-gray-400 mt-1">ETH</p>
+                    <p class="font-bold">{{ wallet.eth_balance|floatformat:8 }}</p>
+                </div>
+                <div class="text-center p-3 bg-gray-700/30 rounded-xl">
+                    <i class="fas fa-coins text-2xl text-green-400"></i>
+                    <p class="text-sm text-gray-400 mt-1">USDT</p>
+                    <p class="font-bold">{{ wallet.usdt_balance|floatformat:2 }}</p>
+                </div>
+                <div class="text-center p-3 bg-gray-700/30 rounded-xl">
+                    <i class="fab fa-solana text-2xl text-green-500"></i>
+                    <p class="text-sm text-gray-400 mt-1">SOL</p>
+                    <p class="font-bold">{{ wallet.sol_balance|floatformat:8|default:"0.00000000" }}</p>
+                </div>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <a href="{% url 'deposit' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-2 rounded-lg transition inline-flex items-center">
+                    <i class="fas fa-plus-circle mr-2"></i> Make a Deposit
+                </a>
+                <a href="{% url 'investments' %}" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg transition inline-flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i> Start Investing
+                </a>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="glass rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-info-circle mr-2 text-blue-400"></i>Getting Started</h3>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="flex items-center">✓ Complete your profile</li>
+                    <li class="flex items-center">✓ Make your first deposit</li>
+                    <li class="flex items-center">✓ Choose an investment plan</li>
+                    <li class="flex items-center">✓ Start earning daily profits</li>
+                </ul>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-headset mr-2 text-green-400"></i>Need Help?</h3>
+                <p class="text-gray-300 mb-4">Our support team is available 24/7 to assist you</p>
+                <a href="#" class="text-blue-400 hover:text-blue-300">Contact Support →</a>
+            </div>
+        </div>
+        
+        <!-- Recent Transactions -->
+        <div class="glass rounded-2xl p-6">
+            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-history mr-2"></i>Recent Transactions</h2>
+            {% if recent_transactions %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3">Type</th>
+                            <th class="text-left py-3">Amount</th>
+                            <th class="text-left py-3">Status</th>
+                            <th class="text-left py-3">Date</th>
+                         </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in recent_transactions %}
+                        <tr class="border-b border-gray-700/50">
+                            <td class="py-3">
+                                {% if tx.transaction_type == 'deposit' %}
+                                    <i class="fas fa-arrow-down text-green-500 mr-2"></i> Deposit
+                                {% elif tx.transaction_type == 'profit' %}
+                                    <i class="fas fa-chart-line text-yellow-500 mr-2"></i> Profit
+                                {% else %}
+                                    <i class="fas fa-arrow-up text-red-500 mr-2"></i> {{ tx.get_transaction_type_display }}
+                                {% endif %}
+                             </td>
+                            <td class="py-3">${{ tx.amount_usd|floatformat:2|intcomma }}</td>
+                            <td class="py-3">
+                                {% if tx.status == 'approved' %}
+                                    <span class="bg-green-600/30 text-green-400 px-2 py-1 rounded-full text-xs">Approved</span>
+                                {% elif tx.status == 'pending' %}
+                                    <span class="bg-yellow-600/30 text-yellow-400 px-2 py-1 rounded-full text-xs">Pending</span>
+                                {% elif tx.status == 'completed' %}
+                                    <span class="bg-blue-600/30 text-blue-400 px-2 py-1 rounded-full text-xs">Completed</span>
+                                {% else %}
+                                    <span class="bg-red-600/30 text-red-400 px-2 py-1 rounded-full text-xs">{{ tx.status|title }}</span>
+                                {% endif %}
+                             </td>
+                            <td class="py-3 text-sm text-gray-400">{{ tx.created_at|date:"M d, Y H:i" }}</td>
+                         </tr>
+                        {% endfor %}
+                    </tbody>
+                 </table>
+            </div>
+            {% else %}
+            <p class="text-gray-400 text-center py-8">No transactions yet. Make your first deposit!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
